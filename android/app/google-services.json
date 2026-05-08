@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "689188628544",
+    "project_id": "lab6-ung-dung-nghe-nhac-online",
+    "storage_bucket": "lab6-ung-dung-nghe-nhac-online.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689188628544:android:4eca9fcb5fc4d1506a97a5",
+        "android_client_info": {
+          "package_name": "com.example.ung_dung_nghe_nhac_online"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDW2O6mpc-ir00wRR5WfAL5_vAjHedh5Wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

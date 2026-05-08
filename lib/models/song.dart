@@ -12,97 +12,76 @@ class Song {
   });
 }
 
-// Danh sách nhạc online mẫu.
-// Muốn phát bài hát thật, bạn cần thay url bằng link mp3 thật hoặc link Firebase Storage.
+// Danh sách 10 bài nhạc online lấy từ GitHub Raw
 List<Song> myPlaylist = [
   Song(
-    title: "SoundHelix Song 1",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    title: "Nàng Thơ",
+    artist: "Hoàng Dũng",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/nang_tho.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=1",
   ),
   Song(
-    title: "SoundHelix Song 2",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    title: "Lạc Trôi",
+    artist: "Sơn Tùng M-TP",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/lac_troi.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=2",
   ),
   Song(
-    title: "SoundHelix Song 3",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    title: "Waiting For Love",
+    artist: "Avicii",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/Waiting_For_Love.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=3",
   ),
   Song(
-    title: "SoundHelix Song 4",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    title: "Waiting For You",
+    artist: "MONO",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/Waiting_For_You.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=4",
   ),
   Song(
-    title: "SoundHelix Song 5",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+    title: "Âm Thầm Bên Em",
+    artist: "Sơn Tùng M-TP",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/am_tham_ben_em.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=5",
   ),
   Song(
-    title: "SoundHelix Song 6",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+    title: "Có Chắc Yêu Là Đây",
+    artist: "Sơn Tùng M-TP",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/co_chac_yeu_la_day.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=6",
   ),
   Song(
-    title: "SoundHelix Song 7",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+    title: "Gác Lại Âu Lo",
+    artist: "Da LAB ft. Miu Lê",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/gac_lai_au_lo.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=7",
   ),
   Song(
-    title: "SoundHelix Song 8",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+    title: "Một Bước Yêu Vạn Dặm Đau",
+    artist: "Mr. Siro",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/mot_buoc_yeu_van_dam_dau.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=8",
   ),
   Song(
-    title: "SoundHelix Song 9",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+    title: "3107",
+    artist: "W/N",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/3107.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=9",
   ),
   Song(
-    title: "SoundHelix Song 10",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+    title: "Phía Sau Một Cô Gái",
+    artist: "Soobin Hoàng Sơn",
+    url:
+        "https://raw.githubusercontent.com/nguyenminhcong04/Lan6_ung_dung_nghe_nhac_online/main/songs/phia_sau_mot_co_gai.mp3",
     coverUrl: "https://picsum.photos/400/400?sig=10",
-  ),
-  Song(
-    title: "SoundHelix Song 11",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3",
-    coverUrl: "https://picsum.photos/400/400?sig=11",
-  ),
-  Song(
-    title: "SoundHelix Song 12",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3",
-    coverUrl: "https://picsum.photos/400/400?sig=12",
-  ),
-  Song(
-    title: "SoundHelix Song 13",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3",
-    coverUrl: "https://picsum.photos/400/400?sig=13",
-  ),
-  Song(
-    title: "SoundHelix Song 14",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3",
-    coverUrl: "https://picsum.photos/400/400?sig=14",
-  ),
-  Song(
-    title: "SoundHelix Song 15",
-    artist: "SoundHelix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3",
-    coverUrl: "https://picsum.photos/400/400?sig=15",
   ),
 ];

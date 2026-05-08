@@ -55,9 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> addSearchHistory(String value) async {
     final keyword = value.trim();
 
-    if (keyword.isEmpty) {
-      return;
-    }
+    if (keyword.isEmpty) return;
 
     setState(() {
       searchHistory.removeWhere(
@@ -148,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final pages = [
       buildHomePage(),
+      buildPersonalPlaylistPage(appProv),
       buildFavoritePage(appProv),
       const ProfileScreen(),
     ];
@@ -173,14 +172,19 @@ class _HomeScreenState extends State<HomeScreen> {
       body: pages[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.deepPurple,
         onTap: (index) {
           setState(() {
             currentIndex = index;
           });
         },
-        selectedItemColor: Colors.deepPurple,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.queue_music),
+            label: "Danh sách",
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: "Yêu thích",
@@ -232,10 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-
         if (query.trim().isEmpty && searchHistory.isNotEmpty)
           buildSearchHistory(),
-
         if (query.trim().isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
@@ -258,7 +260,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-
         Expanded(
           child: listShow.isEmpty
               ? const Center(
@@ -334,6 +335,90 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget buildPersonalPlaylistPage(AppProvider appProv) {
+    final playlist = appProv.personalPlaylist;
+
+    if (playlist.isEmpty) {
+      return const Center(
+        child: Text(
+          "Chưa có bài trong danh sách phát\nHãy bấm nút + ở Trang chủ để thêm bài",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 17),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(12),
+          child: Text(
+            "Giữ và kéo bài hát để tự sắp xếp thứ tự phát",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: ReorderableListView.builder(
+            padding: const EdgeInsets.only(bottom: 12),
+            itemCount: playlist.length,
+            onReorder: (oldIndex, newIndex) {
+              appProv.reorderPersonalPlaylist(oldIndex, newIndex);
+            },
+            itemBuilder: (context, index) {
+              final song = playlist[index];
+
+              return Card(
+                key: ValueKey(song.url),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      song.coverUrl,
+                      width: 58,
+                      height: 58,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 58,
+                          height: 58,
+                          color: Colors.grey,
+                          child: const Icon(Icons.music_note),
+                        );
+                      },
+                    ),
+                  ),
+                  title: Text(
+                    song.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(song.artist),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      appProv.removeFromPersonalPlaylist(song);
+                    },
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PlayerScreen(
+                          playlist: playlist,
+                          currentIndex: index,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget buildFavoritePage(AppProvider appProv) {
     final favoriteList = appProv.favoriteSongs;
 
@@ -374,6 +459,7 @@ class SongItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final appProv = Provider.of<AppProvider>(context);
     final isFavorite = appProv.isFavorite(song);
+    final isInPlaylist = appProv.isInPersonalPlaylist(song);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -400,14 +486,40 @@ class SongItem extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(song.artist),
-        trailing: IconButton(
-          icon: Icon(
-            isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: isFavorite ? Colors.red : Colors.grey,
-          ),
-          onPressed: () {
-            appProv.toggleFavorite(song);
-          },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                isInPlaylist ? Icons.playlist_add_check : Icons.playlist_add,
+                color: isInPlaylist ? Colors.deepPurple : Colors.grey,
+              ),
+              onPressed: () async {
+                await appProv.addToPersonalPlaylist(song);
+
+                if (!context.mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isInPlaylist
+                          ? "${song.title} đã có trong danh sách phát"
+                          : "Đã thêm ${song.title} vào danh sách phát",
+                    ),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? Colors.red : Colors.grey,
+              ),
+              onPressed: () {
+                appProv.toggleFavorite(song);
+              },
+            ),
+          ],
         ),
         onTap: () {
           Navigator.push(

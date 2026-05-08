@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'models/song.dart';
 
 class AppProvider extends ChangeNotifier {
@@ -12,12 +13,12 @@ class AppProvider extends ChangeNotifier {
   }
 
   bool isFavorite(Song song) {
-    return favoriteSongs.any((item) => item.title == song.title);
+    return favoriteSongs.any((item) => item.url == song.url);
   }
 
   void toggleFavorite(Song song) {
     if (isFavorite(song)) {
-      favoriteSongs.removeWhere((item) => item.title == song.title);
+      favoriteSongs.removeWhere((item) => item.url == song.url);
     } else {
       favoriteSongs.add(song);
     }

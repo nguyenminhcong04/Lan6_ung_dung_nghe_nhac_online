@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_provider.dart';
 import '../models/song.dart';
@@ -16,6 +17,78 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String query = "";
   int currentIndex = 0;
+
+  final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
+
+  List<String> searchHistory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadSearchHistory();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> loadSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getStringList("search_history") ?? [];
+
+    if (!mounted) return;
+
+    setState(() {
+      searchHistory = data;
+    });
+  }
+
+  Future<void> saveSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList("search_history", searchHistory);
+  }
+
+  Future<void> addSearchHistory(String value) async {
+    final keyword = value.trim();
+
+    if (keyword.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      searchHistory.removeWhere(
+        (item) => item.toLowerCase() == keyword.toLowerCase(),
+      );
+
+      searchHistory.insert(0, keyword);
+
+      if (searchHistory.length > 10) {
+        searchHistory = searchHistory.take(10).toList();
+      }
+    });
+
+    await saveSearchHistory();
+  }
+
+  Future<void> deleteOneHistory(String value) async {
+    setState(() {
+      searchHistory.remove(value);
+    });
+
+    await saveSearchHistory();
+  }
+
+  Future<void> clearAllHistory() async {
+    setState(() {
+      searchHistory.clear();
+    });
+
+    await saveSearchHistory();
+  }
 
   String removeVietnameseTones(String text) {
     String result = text.toLowerCase();
@@ -44,6 +117,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return title.contains(keyword) || artist.contains(keyword);
     }).toList();
+  }
+
+  void submitSearch(String value) {
+    setState(() {
+      query = value;
+    });
+
+    addSearchHistory(value);
+    searchFocusNode.unfocus();
+  }
+
+  void useHistoryKeyword(String value) {
+    searchController.text = value;
+    searchController.selection = TextSelection.fromPosition(
+      TextPosition(offset: searchController.text.length),
+    );
+
+    setState(() {
+      query = value;
+    });
+
+    addSearchHistory(value);
+    searchFocusNode.requestFocus();
   }
 
   @override
@@ -101,8 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
           child: TextField(
+            controller: searchController,
+            focusNode: searchFocusNode,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.search,
             onChanged: (value) {
@@ -110,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 query = value;
               });
             },
+            onSubmitted: submitSearch,
             decoration: InputDecoration(
               hintText: "Tìm bài hát hoặc nghệ sĩ...",
               prefixIcon: const Icon(Icons.search),
@@ -117,9 +216,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () {
+                        searchController.clear();
+
                         setState(() {
                           query = "";
                         });
+
+                        searchFocusNode.requestFocus();
                       },
                     )
                   : null,
@@ -129,9 +232,41 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+
+        if (query.trim().isEmpty && searchHistory.isNotEmpty)
+          buildSearchHistory(),
+
+        if (query.trim().isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "Kết quả tìm kiếm: $query",
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    addSearchHistory(query);
+                    searchFocusNode.unfocus();
+                  },
+                  icon: const Icon(Icons.save, size: 18),
+                  label: const Text("Lưu"),
+                ),
+              ],
+            ),
+          ),
+
         Expanded(
           child: listShow.isEmpty
-              ? const Center(child: Text("Không tìm thấy bài hát"))
+              ? const Center(
+                  child: Text(
+                    "Không tìm thấy bài hát",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                )
               : ListView.builder(
                   itemCount: listShow.length,
                   itemBuilder: (context, index) {
@@ -146,6 +281,56 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
         ),
       ],
+    );
+  }
+
+  Widget buildSearchHistory() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.history, size: 20),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  "Lịch sử tìm kiếm",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              TextButton(
+                onPressed: clearAllHistory,
+                child: const Text("Xóa tất cả"),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ...searchHistory.map((item) {
+            return ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.search, size: 20),
+              title: Text(item),
+              trailing: IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () {
+                  deleteOneHistory(item);
+                },
+              ),
+              onTap: () {
+                useHistoryKeyword(item);
+              },
+            );
+          }),
+        ],
+      ),
     );
   }
 
